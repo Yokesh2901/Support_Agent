@@ -39,6 +39,11 @@ escalation = EscalationAgent()
 # ----------------------------------------
 @app.route("/", methods=["GET"])
 def home():
+    from src.storage.sqlite_store import count_tickets  # ensure import
+
+    total = count_tickets()
+    next_ticket_id = total + 1
+
     html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -65,21 +70,15 @@ def home():
 
             <h1 class="text-3xl font-bold mb-6 text-center">SmartSupport Agent</h1>
 
-            <!-- DASHBOARD BUTTON -->
-            <div class="text-center mb-6">
-                <a href="/dashboard" 
-                   class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold transition">
-                   📊 View Ticket Dashboard
-                </a>
+            <div class="text-center mb-6 text-yellow-300 font-semibold text-lg">
+                Total Tickets Created: <b>{TOTAL}</b><br>
+                Your Ticket ID: <span class="text-green-400">{NEXT}</span>
             </div>
 
             <form id="ticketForm" class="space-y-5">
-                <div>
-                    <label class="block mb-1 text-gray-300">Ticket ID</label>
-                    <input type="text" id="ticket_id"
-                        class="w-full p-3 rounded bg-gray-800 text-white outline-none" 
-                        value="1" required>
-                </div>
+
+                <!-- TICKET ID HIDDEN - AUTO GENERATED -->
+                <input type="hidden" id="ticket_id" value="{NEXT}">
 
                 <div>
                     <label class="block mb-1 text-gray-300">Issue Description</label>
@@ -98,56 +97,51 @@ def home():
         </div>
 
         <script>
-        document.getElementById("ticketForm").addEventListener("submit", async function(event){
-            event.preventDefault();
+        document.getElementById("ticketForm").addEventListener("submit", async function(e){
+            e.preventDefault();
 
             const ticket_id = document.getElementById("ticket_id").value;
             const text = document.getElementById("text").value;
 
-            const response = await fetch("/ticket", {
+            const res = await fetch("/ticket", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ticket_id, text })
+                body: JSON.stringify({ ticket_id: ticket_id, text: text })
             });
 
-            const data = await response.json();
-            const msg = data?.resolution?.message || data?.message || "No response.";
+            const data = await res.json();
+            const msg = (data.resolution && data.resolution.message) ? data.resolution.message 
+                        : data.message || "No response";
+
+            let color = "text-yellow-300";
+            let title = "Ticket Escalated";
+
+            if (data.status === "resolved") {
+                color = "text-green-400";
+                title = "Issue Resolved Successfully";
+            }
+            if (data.status === "duplicate") {
+                color = "text-red-400";
+                title = "Duplicate Ticket ID";
+            }
 
             document.getElementById("result").innerHTML = `
-                <div class="glass mt-6 p-5">
-
-                    <h2 class="text-xl font-semibold ${
-                        data.status === "resolved" ? "text-green-400" :
-                        data.status === "duplicate" ? "text-red-400" :
-                        "text-yellow-300"
-                    }">
-                        ${
-                            data.status === "resolved"
-                            ? "Issue Resolved Successfully"
-                            : data.status === "duplicate"
-                            ? "Duplicate Ticket ID"
-                            : "Ticket Escalated"
-                        }
-                    </h2>
-
-                    <p class="text-gray-300 leading-relaxed text-lg mt-3">
-                        ${msg.replace(/\\n/g, "<br>")}
-                    </p>
-
-                    <p class="text-sm text-gray-500 mt-4">
-                        <strong>Reference ID:</strong> ${data.request_id}
-                    </p>
+                <div class="glass p-5 rounded">
+                    <h2 class="text-xl font-bold ${color}">${title}</h2>
+                    <p class="mt-3 text-gray-300">${msg.replace(/\\n/g, "<br>")}</p>
+                    <p class="text-sm text-gray-500 mt-3"><b>Reference ID:</b> ${data.request_id}</p>
                 </div>
             `;
-
             document.getElementById("result").classList.remove("hidden");
         });
         </script>
 
     </body>
     </html>
-    """
+    """.replace("{TOTAL}", str(total)).replace("{NEXT}", str(next_ticket_id))
+
     return render_template_string(html)
+
 
 # ----------------------------------------
 # HEALTH
