@@ -1,7 +1,7 @@
 import sys
 import os
 import uuid
-from flask import Flask, request, jsonify, render_template_string, session, redirect
+from flask import Flask, request, jsonify, render_template_string
 
 # ----------------------------------------
 # FIX PYTHON PATH
@@ -21,14 +21,11 @@ from src.agents.resolver_agent import ResolverAgent
 from src.storage.sqlite_store import init_db, save_ticket, list_tickets, ticket_exists
 from src.observability.observability import log_event
 from src.memory.memory_bank import MemoryBank
-from src.storage.sqlite_store import init_db, save_ticket, list_tickets, ticket_exists, count_tickets
-
 
 # ----------------------------------------
 # INIT SYSTEM
 # ----------------------------------------
 app = Flask(__name__)
-app.secret_key = "SUPER_SECRET_KEY_CHANGE_ME"
 
 init_db()
 memory = MemoryBank()
@@ -37,16 +34,12 @@ triage = TriageAgent()
 resolver = ResolverAgent()
 escalation = EscalationAgent()
 
-
-# ======================================================================
-#                             HOME PAGE UI
-# ======================================================================
+# ----------------------------------------
+# HOME PAGE UI
+# ----------------------------------------
 @app.route("/", methods=["GET"])
 def home():
-    total = count_tickets()          # how many tickets already created
-    next_ticket_id = total + 1       # suggest next ID
-
-    html = f"""
+    html = """
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -55,37 +48,37 @@ def home():
         <script src="https://cdn.tailwindcss.com"></script>
 
         <style>
-            body {{
-                background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
-            }}
-            .glass {{
+            body { background: linear-gradient(135deg, #0f0f0f, #1a1a1a); }
+            .glass {
                 backdrop-filter: blur(14px);
                 background: rgba(255,255,255,0.08);
                 border: 1px solid rgba(255,255,255,0.15);
                 border-radius: 20px;
                 padding: 30px;
                 box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-            }}
+            }
         </style>
     </head>
 
     <body class="min-h-screen flex items-center justify-center p-8 text-white">
         <div class="glass max-w-2xl w-full">
 
-            <h1 class="text-3xl font-bold mb-4 text-center">SmartSupport Agent</h1>
+            <h1 class="text-3xl font-bold mb-6 text-center">SmartSupport Agent</h1>
 
-            <!-- ⭐ SHOW TOTAL TICKETS -->
-            <div class="mb-6 text-center text-lg text-yellow-300 font-semibold">
-                Total Tickets Created: {total} <br>
-                Please use Ticket ID: <span class="text-green-400">{next_ticket_id}</span>
+            <!-- DASHBOARD BUTTON -->
+            <div class="text-center mb-6">
+                <a href="/dashboard" 
+                   class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold transition">
+                   📊 View Ticket Dashboard
+                </a>
             </div>
 
             <form id="ticketForm" class="space-y-5">
                 <div>
                     <label class="block mb-1 text-gray-300">Ticket ID</label>
                     <input type="text" id="ticket_id"
-                        class="w-full p-3 rounded bg-gray-800 text-white outline-none"
-                        value="{next_ticket_id}" required>
+                        class="w-full p-3 rounded bg-gray-800 text-white outline-none" 
+                        value="1" required>
                 </div>
 
                 <div>
@@ -111,24 +104,39 @@ def home():
             const ticket_id = document.getElementById("ticket_id").value;
             const text = document.getElementById("text").value;
 
-            const response = await fetch("/ticket", {{
+            const response = await fetch("/ticket", {
                 method: "POST",
-                headers: {{ "Content-Type": "application/json" }},
-                body: JSON.stringify({{ ticket_id, text }})
-            }});
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ticket_id, text })
+            });
 
             const data = await response.json();
             const msg = data?.resolution?.message || data?.message || "No response.";
 
             document.getElementById("result").innerHTML = `
-                <div class="success-card glass mt-6 p-5">
-                    <h2 class="text-xl font-semibold text-green-400">
-                        ${data.status.toUpperCase()}
+                <div class="glass mt-6 p-5">
+
+                    <h2 class="text-xl font-semibold ${
+                        data.status === "resolved" ? "text-green-400" :
+                        data.status === "duplicate" ? "text-red-400" :
+                        "text-yellow-300"
+                    }">
+                        ${
+                            data.status === "resolved"
+                            ? "Issue Resolved Successfully"
+                            : data.status === "duplicate"
+                            ? "Duplicate Ticket ID"
+                            : "Ticket Escalated"
+                        }
                     </h2>
-                    <p class="text-gray-300 mt-2">${msg.replace(/\\n/g, "<br>")}</p>
-                    <div class="mt-3 text-sm text-gray-500">
-                        Reference ID: ${data.request_id}
-                    </div>
+
+                    <p class="text-gray-300 leading-relaxed text-lg mt-3">
+                        ${msg.replace(/\\n/g, "<br>")}
+                    </p>
+
+                    <p class="text-sm text-gray-500 mt-4">
+                        <strong>Reference ID:</strong> ${data.request_id}
+                    </p>
                 </div>
             `;
 
@@ -139,232 +147,135 @@ def home():
     </body>
     </html>
     """
-
     return render_template_string(html)
 
+# ----------------------------------------
+# HEALTH
+# ----------------------------------------
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok"})
 
-
-
-# ======================================================================
-#                             ADMIN LOGIN PAGE
-# ======================================================================
-@app.route("/admin-login", methods=["GET", "POST"])
-def admin_login():
-    html = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Admin Login</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-
-    <body class="bg-gray-900 flex items-center justify-center min-h-screen text-white">
-
-        <form method="POST" class="glass p-8 rounded-lg max-w-md w-full">
-            <h2 class="text-3xl font-bold text-center mb-6">Admin Login</h2>
-
-            <label class="block mb-2">Login ID</label>
-            <input name="username" class="w-full p-3 rounded bg-gray-800 mb-4" required>
-
-            <label class="block mb-2">Password</label>
-            <input type="password" name="password" class="w-full p-3 rounded bg-gray-800 mb-4" required>
-
-            <button class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded text-white font-semibold">
-                Login
-            </button>
-
-            <p class="text-red-400 text-center mt-3">%s</p>
-        </form>
-
-    </body>
-    </html>
-    """
-
-    error = ""
-
-    if request.method == "POST":
-        if request.form.get("username") == "Yokesh29" and request.form.get("password") == "Yovan@29":
-            session["admin"] = True
-            return redirect("/dashboard")
-        else:
-            error = "Invalid username or password"
-
-    return html % error
-
-
-
-# ======================================================================
-#                                LOGOUT
-# ======================================================================
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/admin-login")
-
-
-
-# ======================================================================
-#                             TICKET DASHBOARD
-# ======================================================================
+# ----------------------------------------
+# DASHBOARD
+# ----------------------------------------
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
-
-    # ADMIN PROTECTION
-    if not session.get("admin"):
-        return redirect("/admin-login")
-
     tickets = list_tickets(200)
 
     html = """
     <!DOCTYPE html>
     <html>
     <head>
-        <meta charset="UTF-8"/>
-        <title>Ticket Dashboard</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <style>
-            body { background: #0f0f0f; color: white; }
-            .glass { 
-                backdrop-filter: blur(12px);
-                background: rgba(255,255,255,0.05);
-                border-radius: 14px;
-                border: 1px solid rgba(255,255,255,0.1);
-            }
-        </style>
+        <title>Dashboard</title>
     </head>
-
-    <body class="p-10">
-
-        <h1 class="text-3xl font-bold mb-6 text-center">📊 Ticket Dashboard</h1>
-
-        <div class="text-center mb-6">
-            <a href="/" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Back to Home</a>
-            <a href="/logout" class="px-4 py-2 bg-red-600 rounded hover:bg-red-700 ml-2">Logout</a>
-        </div>
+    <body class='p-10 text-white bg-black'>
+        <h1 class='text-3xl font-bold mb-6 text-center'>📊 Ticket Dashboard</h1>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     """
 
-    # Render Tickets
     for t in tickets:
-        status_color = {
+        color = {
             "resolved": "text-green-400",
-            "escalated": "text-yellow-400",
-            "duplicate": "text-red-400"
+            "duplicate": "text-red-400",
+            "escalated": "text-yellow-400"
         }.get(t["status"], "text-gray-300")
 
         html += f"""
-        <div class="glass p-5 shadow-lg">
-            <h2 class="text-xl font-bold mb-2">Ticket ID: {t['ticket_id']}</h2>
-            <p class="text-gray-300 mb-2"><strong>Intent:</strong> {t['intent']}</p>
-            <p class="{status_color} mb-2"><strong>Status:</strong> {t['status'].upper()}</p>
-
-            <details class="mt-3">
-                <summary class="cursor-pointer text-blue-400">View Details</summary>
-                <div class="mt-2 text-gray-300 text-sm">
-                    <p><strong>Issue:</strong><br>{t['text']}</p>
-                    <p class="mt-2"><strong>Resolution:</strong><br>{t['resolution']['message']}</p>
-                </div>
-            </details>
-        </div>
+            <div class='p-5 bg-gray-900 rounded-lg border border-gray-700'>
+                <h2 class='text-xl font-bold'>Ticket ID: {t['ticket_id']}</h2>
+                <p><strong>Intent:</strong> {t['intent']}</p>
+                <p class='{color}'><strong>Status:</strong> {t['status']}</p>
+                <details class='mt-3'>
+                    <summary class='cursor-pointer text-blue-400'>View Details</summary>
+                    <p class='mt-2 text-gray-300'>{t['text']}</p>
+                    <p class='mt-2 text-gray-400'>{t['resolution']['message']}</p>
+                </details>
+            </div>
         """
 
-    html += """
-        </div>
-    </body>
-    </html>
-    """
-
+    html += "</div></body></html>"
     return render_template_string(html)
 
-
-
-# ======================================================================
-#                          PROCESS TICKET
-# ======================================================================
+# ----------------------------------------
+# PROCESS TICKET
+# ----------------------------------------
 @app.route("/ticket", methods=["POST"])
 def receive_ticket():
     request_id = str(uuid.uuid4())
-
     payload = request.json if request.is_json else request.form.to_dict()
 
-    ticket = {
-        "ticket_id": payload.get("ticket_id", request_id),
-        "text": payload.get("text", "")
-    }
+    ticket_id = payload.get("ticket_id", request_id)
 
     # DUPLICATE CHECK
-    if ticket_exists(ticket["ticket_id"]):
+    if ticket_exists(ticket_id):
         return jsonify({
             "request_id": request_id,
             "status": "duplicate",
-            "message": f"Ticket ID {ticket['ticket_id']} is already used. Please use a new ticket ID."
+            "message": f"Ticket ID {ticket_id} is already used."
         })
 
-    log_event("received_ticket", {"ticket": ticket["ticket_id"]})
+    ticket = {
+        "ticket_id": ticket_id,
+        "text": payload.get("text", "")
+    }
 
-    session_data = ingest.process(ticket)
-    triage_res = triage.process(session_data)
+    log_event("received_ticket", {"ticket": ticket_id})
 
-    primary_intent = triage_res.get("intent")
-    secondary_intents = triage_res.get("secondary_intents", [])
+    session = ingest.process(ticket)
+    triage_res = triage.process(session)
+
+    primary_intent = triage_res["intent"]
+    secondary = triage_res["secondary_intents"]
 
     messages = []
 
-    # Primary intent response
-    primary_output = resolver.process(session_data, {"intent": primary_intent})
-    if "message" in primary_output:
-        messages.append(primary_output["message"])
+    primary_res = resolver.process(session, {"intent": primary_intent})
+    if primary_res.get("message"):
+        messages.append(primary_res["message"])
 
-    # Secondary intents
-    for sec in secondary_intents:
-        sec_output = resolver.process(session_data, {"intent": sec})
-        if "message" in sec_output:
-            messages.append(sec_output["message"])
+    for sec in secondary:
+        sec_res = resolver.process(session, {"intent": sec})
+        if sec_res.get("message"):
+            messages.append(sec_res["message"])
 
     final_message = "\n\n".join(messages)
 
     resolution = {
-        "status": primary_output.get("status", "resolved"),
+        "status": primary_res.get("status", "resolved"),
         "message": final_message
     }
 
-    # SAVE IN DB
     save_ticket({
-        "ticket_id": ticket["ticket_id"],
+        "ticket_id": ticket_id,
         "text": ticket["text"],
         "intent": primary_intent,
         "status": resolution["status"],
         "resolution": resolution
     })
 
-    # Save memory if resolved
     if resolution["status"] == "resolved":
-        memory.save({
-            "ticket_id": ticket["ticket_id"],
-            "text": ticket["text"],
-            "intent": primary_intent,
+        memory.save(ticket)
+        return jsonify({
+            "request_id": request_id,
+            "status": "resolved",
             "resolution": resolution
         })
-        return jsonify({"request_id": request_id, "status": "resolved", "resolution": resolution})
 
-    # Escalation
-    escalated = escalation.process(session_data, triage_res, resolution)
+    esc = escalation.process(session, triage_res, resolution)
 
     return jsonify({
         "request_id": request_id,
         "status": "escalated",
-        "message": final_message,
-        "escalation": escalated
+        "escalation": esc,
+        "message": final_message
     })
 
-
-# ======================================================================
-#                          START SERVER
-# ======================================================================
+# ----------------------------------------
+# RUN FLASK FOR RENDER
+# ----------------------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5500))
-    print(f"🚀 SmartSupport server running on 0.0.0.0:{port}")
     app.run(host="0.0.0.0", port=port)
-
-
