@@ -384,6 +384,8 @@ def receive_ticket():
 #                          START SERVER
 # ======================================================================
 if __name__ == "__main__":
-    print("🚀 SmartSupport server running at: http://127.0.0.1:5500")
-    app.run(host="127.0.0.1", port=5500)
+    port = int(os.environ.get("PORT", 5500))
+    print(f"🚀 SmartSupport server running on 0.0.0.0:{port}")
+    app.run(host="0.0.0.0", port=port)
+
 
