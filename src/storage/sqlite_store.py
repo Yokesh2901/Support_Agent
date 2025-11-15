@@ -76,3 +76,12 @@ def ticket_exists(ticket_id):
 
     conn.close()
     return exists
+
+def count_tickets():
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM tickets")
+    total = cur.fetchone()[0]
+    conn.close()
+    return total
+
