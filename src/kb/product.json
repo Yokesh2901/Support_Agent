@@ -1,0 +1,23 @@
+{
+  "domain": "product",
+  "articles": [
+    {
+      "id": "prod-001",
+      "title": "Dashboard quickstart",
+      "tags": ["dashboard","how to","create project"],
+      "content": "To create a project: Dashboard > New Project > enter name > choose template > Create. Use the left nav to access settings, data, and reports. See the 'Getting Started' tour for step-by-step guidance."
+    },
+    {
+      "id": "prod-002",
+      "title": "Enable notifications",
+      "tags": ["notifications","alerts","settings"],
+      "content": "Go to Account > Notifications and toggle email/push options. Ensure your device allows notifications for the app."
+    },
+    {
+      "id": "prod-003",
+      "title": "Export reports",
+      "tags": ["export","reports","download"],
+      "content": "Open Reports > Select date range > Click Export > Choose CSV/PDF. Exports are processed in the background and emailed when ready."
+    }
+  ]
+}

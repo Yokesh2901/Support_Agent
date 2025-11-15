@@ -1,0 +1,29 @@
+{
+  "domain": "billing",
+  "articles": [
+    {
+      "id": "bill-001",
+      "title": "Refund policy & process",
+      "tags": ["refund","billing","payment"],
+      "content": "We process refunds within 5–7 business days after approval. To request a refund, provide order id, amount, and reason. Refunds are returned to the original payment method."
+    },
+    {
+      "id": "bill-002",
+      "title": "Download invoice or receipt",
+      "tags": ["invoice","receipt","billing"],
+      "content": "Go to Account > Billing > Invoices. Select the month and click 'Download'. If invoice is missing, contact billing with your account email and month."
+    },
+    {
+      "id": "bill-003",
+      "title": "Handling payment failures",
+      "tags": ["payment failed","card declined","upi"],
+      "content": "Payment failures can be caused by expired card, bank declines, or network issues. Try another card, ensure billing address matches, or contact your bank for declines."
+    },
+    {
+      "id": "bill-004",
+      "title": "Change or cancel subscription",
+      "tags": ["subscription","upgrade","cancel"],
+      "content": "To change plan: Account > Billing > Manage Subscription. Upgrades are immediate; downgrades may apply at next billing cycle. To cancel, follow the cancel flow and review final charges."
+    }
+  ]
+}

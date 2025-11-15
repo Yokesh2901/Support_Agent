@@ -1,0 +1,29 @@
+{
+  "domain": "account",
+  "articles": [
+    {
+      "id": "acc-001",
+      "title": "Password reset procedure",
+      "tags": ["password", "reset", "login"],
+      "content": "Steps:\n1. Open the sign-in page.\n2. Click 'Forgot Password'.\n3. Enter your registered email address.\n4. Open the email and click the verification link.\n5. Choose and confirm a new password.\nNotes: Check spam folder if you don't see the email within 5 minutes."
+    },
+    {
+      "id": "acc-002",
+      "title": "Troubleshooting login problems",
+      "tags": ["login", "sign in", "authentication"],
+      "content": "If you can't log in: 1) Confirm your email address; 2) Try reset password; 3) Clear browser cache / app storage; 4) Verify your account isn't locked."
+    },
+    {
+      "id": "acc-003",
+      "title": "Unlocking a locked account",
+      "tags": ["locked", "too many attempts", "account disabled"],
+      "content": "Accounts are locked after repeated failed logins. Wait 30 minutes for auto-unlock or contact support to manually unlock. Be ready with your email and last login time."
+    },
+    {
+      "id": "acc-004",
+      "title": "Update email or phone number",
+      "tags": ["update email", "change phone", "profile"],
+      "content": "To change email/phone: go to Account > Profile > Edit. For email changes, we may send a verification link to the new email; follow it to confirm."
+    }
+  ]
+}

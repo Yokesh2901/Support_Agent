@@ -1,0 +1,301 @@
+[
+  {
+    "ticket_id": 1,
+    "text": "I forgot my password",
+    "intent": "password_reset",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "title": "Password reset procedure",
+        "steps": [
+          "Go to https://example.com/reset",
+          "Enter your registered email address",
+          "Click the verification link in the email",
+          "Choose a new password and confirm"
+        ],
+        "source": "internal-kb/demo"
+      },
+      "confidence": 0.95
+    }
+  },
+  {
+    "ticket_id": "1",
+    "text": "forgot password",
+    "intent": "password_reset",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "title": "Password reset procedure",
+        "steps": [
+          "Go to https://example.com/reset",
+          "Enter your registered email address",
+          "Click the verification link in the email",
+          "Choose a new password and confirm"
+        ],
+        "source": "internal-kb/demo"
+      },
+      "confidence": 0.95
+    }
+  },
+  {
+    "ticket_id": "1",
+    "text": "forgot password",
+    "intent": "password_reset",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "title": "Password reset procedure",
+        "steps": [
+          "Go to https://example.com/reset",
+          "Enter your registered email address",
+          "Click the verification link in the email",
+          "Choose a new password and confirm"
+        ],
+        "source": "internal-kb/demo"
+      },
+      "confidence": 0.95
+    }
+  },
+  {
+    "ticket_id": "1",
+    "text": "How do I reset my password?",
+    "intent": "password_reset",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "id": "acc-001",
+        "title": "Password reset procedure",
+        "tags": [
+          "password",
+          "reset",
+          "login"
+        ],
+        "content": "Steps:\\n1. Go to https://example.com/reset\\n2. Enter registered email\\n3. Click verification link\\n4. Choose new password and confirm",
+        "_domain": "account"
+      },
+      "confidence": 0.95
+    }
+  },
+  {
+    "ticket_id": "1",
+    "text": "Reset my account password",
+    "intent": "password_reset",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "id": "acc-001",
+        "title": "Password reset procedure",
+        "tags": [
+          "password",
+          "reset",
+          "login"
+        ],
+        "content": "Steps:\\n1. Go to https://example.com/reset\\n2. Enter registered email\\n3. Click verification link\\n4. Choose new password and confirm",
+        "_domain": "account"
+      },
+      "confidence": 0.95
+    }
+  },
+  {
+    "ticket_id": "3",
+    "text": "Error 500 while opening the app",
+    "intent": "error_code",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "id": "bill-002",
+        "title": "Invoice download",
+        "tags": [
+          "invoice",
+          "receipt"
+        ],
+        "content": "Go to Account > Billing > Invoices and click Download on the desired month.",
+        "_domain": "billing"
+      },
+      "confidence": 0.8
+    }
+  },
+  {
+    "ticket_id": "3",
+    "text": "App keeps crashing",
+    "intent": "app_crash",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "id": "tech-001",
+        "title": "App crash on startup (Windows)",
+        "tags": [
+          "crash",
+          "startup",
+          "windows"
+        ],
+        "content": "Common causes: corrupted cache, incompatible drivers. Try clearing cache: %APPDATA%/MyApp/cache and reinstalling.",
+        "_domain": "technical"
+      },
+      "confidence": 0.8
+    }
+  },
+  {
+    "ticket_id": "3",
+    "text": "Network timeout on login",
+    "intent": "login_issue",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "id": "acc-001",
+        "title": "Password reset procedure",
+        "tags": [
+          "password",
+          "reset",
+          "login"
+        ],
+        "content": "Steps:\\n1. Go to https://example.com/reset\\n2. Enter registered email\\n3. Click verification link\\n4. Choose new password and confirm",
+        "_domain": "account"
+      },
+      "confidence": 0.85
+    }
+  },
+  {
+    "ticket_id": "3",
+    "text": "I forgot my password and the app shows error 500",
+    "intent": "password_reset",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "id": "acc-001",
+        "title": "Password reset procedure",
+        "tags": [
+          "password",
+          "reset",
+          "login"
+        ],
+        "content": "Steps:\\n1. Go to https://example.com/reset\\n2. Enter registered email\\n3. Click verification link\\n4. Choose new password and confirm",
+        "_domain": "account"
+      },
+      "confidence": 0.95
+    }
+  },
+  {
+    "ticket_id": "3",
+    "text": "I forgot my password and the app shows error 500",
+    "intent": "password_reset",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "id": "acc-001",
+        "title": "Password reset procedure",
+        "tags": [
+          "password",
+          "reset",
+          "login"
+        ],
+        "content": "Steps:\\n1. Go to https://example.com/reset\\n2. Enter registered email\\n3. Click verification link\\n4. Choose new password and confirm",
+        "_domain": "account"
+      },
+      "confidence": 0.95
+    }
+  },
+  {
+    "ticket_id": "3",
+    "text": "I forgot my password and the app shows error 500",
+    "intent": "password_reset",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "id": "acc-001",
+        "title": "Password reset procedure",
+        "tags": [
+          "password",
+          "reset",
+          "login"
+        ],
+        "content": "Steps:\\n1. Go to https://example.com/reset\\n2. Enter registered email\\n3. Click verification link\\n4. Choose new password and confirm",
+        "_domain": "account"
+      },
+      "confidence": 0.95
+    }
+  },
+  {
+    "ticket_id": "3",
+    "text": "I forgot my password and the app shows error 500",
+    "intent": "password_reset",
+    "resolution": {
+      "status": "resolved",
+      "action": {
+        "id": "acc-001",
+        "title": "Password reset procedure",
+        "tags": [
+          "password",
+          "reset",
+          "login"
+        ],
+        "content": "Steps:\\n1. Go to https://example.com/reset\\n2. Enter registered email\\n3. Click verification link\\n4. Choose new password and confirm",
+        "_domain": "account"
+      },
+      "confidence": 0.95
+    }
+  },
+  {
+    "ticket_id": "1",
+    "text": "Change phone number",
+    "intent": "update_email",
+    "resolution": {
+      "status": "resolved",
+      "message": "You can update your account details by going to:\n\nSettings \u2192 Account \u2192 Profile \u2192 Edit\n\nFor email updates, you will receive a verification link on the new email address.\nClicking the verification link completes the update process."
+    }
+  },
+  {
+    "ticket_id": "1",
+    "text": "Change phone number",
+    "intent": "update_email",
+    "resolution": {
+      "status": "resolved",
+      "message": "You can update your account details by going to:\n\nSettings \u2192 Account \u2192 Profile \u2192 Edit\n\nFor email updates, you will receive a verification link on the new email address.\nClicking the verification link completes the update process."
+    }
+  },
+  {
+    "ticket_id": "1",
+    "text": "Change phone number",
+    "intent": "update_email",
+    "resolution": {
+      "status": "resolved",
+      "message": "You can update your account details by going to:\n\nSettings \u2192 Account \u2192 Profile \u2192 Edit\n\nFor email updates, you will receive a verification link on the new email address.\nClicking the verification link completes the update process."
+    }
+  },
+  {
+    "ticket_id": "1",
+    "text": "update email\n",
+    "intent": "update_email",
+    "resolution": {
+      "status": "resolved",
+      "message": "You can update your account details by going to:\n\nSettings \u2192 Account \u2192 Profile \u2192 Edit\n\nFor email updates, you will receive a verification link on the new email address.\nClicking the verification link completes the update process."
+    }
+  },
+  {
+    "ticket_id": "2",
+    "text": "update email\n",
+    "intent": "update_email",
+    "resolution": {
+      "status": "resolved",
+      "message": "You can update your account details by going to:\n\nSettings \u2192 Account \u2192 Profile \u2192 Edit\n\nFor email updates, you will receive a verification link on the new email address.\nClicking the verification link completes the update process."
+    }
+  },
+  {
+    "ticket_id": "3",
+    "text": "update email",
+    "intent": "update_email",
+    "resolution": {
+      "status": "resolved",
+      "message": "You can update your account details by going to:\n\nSettings \u2192 Account \u2192 Profile \u2192 Edit\n\nFor email updates, you will receive a verification link on the new email address.\nClicking the verification link completes the update process."
+    }
+  },
+  {
+    "ticket_id": "4",
+    "text": "Forgot password and app crashing",
+    "intent": "password_reset",
+    "resolution": {
+      "status": "resolved",
+      "message": "Sure \u2014 here\u2019s how to reset your password:\n\nSteps: 1. Open the sign-in page. 2. Click 'Forgot Password'. 3. Enter your registered email address. 4. Open the email and click the verification link. 5. Choose and confirm a new password. Notes: Check spam folder if you don't see the email within 5 minutes.\n\nI found this troubleshooting guide:\n\nSteps: 1. Open the sign-in page. 2. Click 'Forgot Password'. 3. Enter your registered email address. 4. Open the email and click the verification link. 5. Choose and confirm a new password. Notes: Check spam folder if you don't see the email within 5 minutes."
+    }
+  }
+]

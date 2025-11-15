@@ -1,0 +1,17 @@
+{
+  "domain": "orders",
+  "articles": [
+    {
+      "id": "ord-001",
+      "title": "How to track your order",
+      "tags": ["track","order","delivery","shipping"],
+      "content": "To track: open Orders > select the order > click 'Track'. You will receive carrier updates. If tracking doesn't update for more than 3 days, contact support with your tracking number."
+    },
+    {
+      "id": "ord-002",
+      "title": "Cancel or return an order",
+      "tags": ["cancel","return","refund","order"],
+      "content": "If your order hasn't shipped, you may cancel from Orders > Details > Cancel. For returns, check the Returns policy and submit a return request; include order id and reason."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "domain": "technical",
+  "articles": [
+    {
+      "id": "tech-001",
+      "title": "App crash on startup (Windows)",
+      "tags": ["crash","startup","windows"],
+      "content": "If the app crashes on startup: 1) Clear cache (App data directory); 2) Reinstall app; 3) Update graphics drivers; 4) Check logs at %APPDATA%/MyApp/logs. If it persists, attach logs to a support ticket."
+    },
+    {
+      "id": "tech-002",
+      "title": "Network timeout & 504 errors",
+      "tags": ["timeout","504","502","network"],
+      "content": "504/502 errors often mean upstream service is slow. Try: 1) Retry after 30 seconds; 2) Check network connection; 3) If persistent, collect request timestamp and send logs for debugging."
+    },
+    {
+      "id": "tech-003",
+      "title": "Performance troubleshooting",
+      "tags": ["slow","lag","performance"],
+      "content": "If the app/site is slow: 1) Clear cache; 2) Test in Incognito; 3) Check CPU/RAM usage; 4) Try a different network; 5) Provide steps to reproduce for further investigation."
+    }
+  ]
+}
