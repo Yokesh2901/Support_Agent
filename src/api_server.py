@@ -21,6 +21,8 @@ from src.agents.resolver_agent import ResolverAgent
 from src.storage.sqlite_store import init_db, save_ticket, list_tickets, ticket_exists
 from src.observability.observability import log_event
 from src.memory.memory_bank import MemoryBank
+from src.storage.sqlite_store import init_db, save_ticket, list_tickets, ticket_exists, count_tickets
+
 
 # ----------------------------------------
 # INIT SYSTEM
@@ -41,7 +43,10 @@ escalation = EscalationAgent()
 # ======================================================================
 @app.route("/", methods=["GET"])
 def home():
-    html = """
+    total = count_tickets()          # how many tickets already created
+    next_ticket_id = total + 1       # suggest next ID
+
+    html = f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -50,40 +55,37 @@ def home():
         <script src="https://cdn.tailwindcss.com"></script>
 
         <style>
-            body {
+            body {{
                 background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
-            }
-            .glass {
+            }}
+            .glass {{
                 backdrop-filter: blur(14px);
                 background: rgba(255,255,255,0.08);
                 border: 1px solid rgba(255,255,255,0.15);
                 border-radius: 20px;
                 padding: 30px;
                 box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-            }
+            }}
         </style>
     </head>
 
     <body class="min-h-screen flex items-center justify-center p-8 text-white">
         <div class="glass max-w-2xl w-full">
 
-            <h1 class="text-3xl font-bold mb-6 text-center">SmartSupport Agent</h1>
+            <h1 class="text-3xl font-bold mb-4 text-center">SmartSupport Agent</h1>
 
-            <!-- DASHBOARD BUTTON -->
-            <div class="text-center mb-6">
-                <a href="/dashboard" 
-                   class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold transition">
-                   📊 View Ticket Dashboard
-                </a>
+            <!-- ⭐ SHOW TOTAL TICKETS -->
+            <div class="mb-6 text-center text-lg text-yellow-300 font-semibold">
+                Total Tickets Created: {total} <br>
+                Please use Ticket ID: <span class="text-green-400">{next_ticket_id}</span>
             </div>
 
-            <!-- TICKET FORM -->
             <form id="ticketForm" class="space-y-5">
                 <div>
                     <label class="block mb-1 text-gray-300">Ticket ID</label>
                     <input type="text" id="ticket_id"
-                        class="w-full p-3 rounded bg-gray-800 text-white outline-none" 
-                        value="1" required>
+                        class="w-full p-3 rounded bg-gray-800 text-white outline-none"
+                        value="{next_ticket_id}" required>
                 </div>
 
                 <div>
@@ -99,11 +101,9 @@ def home():
                 </button>
             </form>
 
-            <!-- RESULT BOX -->
             <div id="result" class="mt-6 hidden"></div>
         </div>
 
-        <!-- SCRIPT -->
         <script>
         document.getElementById("ticketForm").addEventListener("submit", async function(event){
             event.preventDefault();
@@ -111,46 +111,23 @@ def home():
             const ticket_id = document.getElementById("ticket_id").value;
             const text = document.getElementById("text").value;
 
-            const response = await fetch("/ticket", {
+            const response = await fetch("/ticket", {{
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ticket_id, text })
-            });
+                headers: {{ "Content-Type": "application/json" }},
+                body: JSON.stringify({{ ticket_id, text }})
+            }});
 
             const data = await response.json();
             const msg = data?.resolution?.message || data?.message || "No response.";
 
             document.getElementById("result").innerHTML = `
-                <div class="glass mt-6 p-5">
-
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-3 h-3 ${
-                            data.status === "resolved" ? "bg-green-500" :
-                            data.status === "duplicate" ? "bg-red-500" :
-                            "bg-yellow-500"
-                        } rounded-full"></div>
-
-                        <h2 class="text-xl font-semibold ${
-                            data.status === "resolved" ? "text-green-400" :
-                            data.status === "duplicate" ? "text-red-400" :
-                            "text-yellow-300"
-                        }">
-                            ${
-                                data.status === "resolved"
-                                ? "Issue Resolved Successfully"
-                                : data.status === "duplicate"
-                                ? "Duplicate Ticket ID"
-                                : "Ticket Escalated to Human Support"
-                            }
-                        </h2>
-                    </div>
-
-                    <p class="text-gray-300 leading-relaxed text-lg">
-                        ${msg.replace(/\\n/g, "<br>")}
-                    </p>
-
-                    <div class="mt-4 text-sm text-gray-500">
-                        <strong>Reference ID:</strong> ${data.request_id}
+                <div class="success-card glass mt-6 p-5">
+                    <h2 class="text-xl font-semibold text-green-400">
+                        ${data.status.toUpperCase()}
+                    </h2>
+                    <p class="text-gray-300 mt-2">${msg.replace(/\\n/g, "<br>")}</p>
+                    <div class="mt-3 text-sm text-gray-500">
+                        Reference ID: ${data.request_id}
                     </div>
                 </div>
             `;
@@ -162,7 +139,9 @@ def home():
     </body>
     </html>
     """
+
     return render_template_string(html)
+
 
 
 
