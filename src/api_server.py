@@ -35,7 +35,7 @@ from src.memory.memory_bank import MemoryBank
 # ----------------------------------------
 app = Flask(__name__)
 # change this secret key in production
-app.secret_key = "CHANGE_ME_TO_A_RANDOM_SECRET"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-only-change-me")
 
 # initialize DB + components
 init_db()
@@ -232,7 +232,9 @@ def admin_login():
     if request.method == "POST":
         username = request.form.get("username", "")
         password = request.form.get("password", "")
-        if username == "Yokesh29" and password == "Yovan@29":
+        admin_username = os.environ.get("ADMIN_USERNAME")
+        admin_password = os.environ.get("ADMIN_PASSWORD")
+        if admin_username and admin_password and username == admin_username and password == admin_password:
             session["admin"] = True
             return redirect(url_for("dashboard"))
         else:
@@ -355,4 +357,4 @@ def receive_ticket():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5500))
     # bind to 0.0.0.0 so Render/Heroku can route traffic
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=os.environ.get("FLASK_DEBUG", "0") == "1")
